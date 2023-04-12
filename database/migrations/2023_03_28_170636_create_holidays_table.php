@@ -20,6 +20,7 @@ return new class extends Migration
             $table->integer('employee_id');
             $table->string('type');
             $table->string('reason')->nullable();
+            $table->integer('admin_id');
             $table->timestamps();
         });
     }

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('company_id');
             $table->string('name');
             $table->integer('work_hours');
+            $table->integer('admin_id');
             $table->timestamps();
         });
     }

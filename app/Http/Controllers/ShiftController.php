@@ -60,6 +60,7 @@ class ShiftController extends Controller
         $shift->company_id = $company_id;
         $shift->name = $name;
         $shift->work_hours = $work_hours;
+        $shift->admin_id = $request->user()->id;
         $shift->save();
 
         return redirect(route('shifts.index'));

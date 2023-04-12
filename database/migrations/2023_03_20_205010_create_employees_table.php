@@ -22,6 +22,8 @@ return new class extends Migration
             $table->string('address')->nullable();
             $table->integer('company_id');
             $table->boolean('is_efo');
+            $table->integer('admin_id');
+            $table->boolean('is_active');
             $table->timestamps();
         });
     }

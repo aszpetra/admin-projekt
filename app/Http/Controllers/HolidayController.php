@@ -65,6 +65,7 @@ class HolidayController extends Controller
         $holiday->start_date = $start_date->format('Y-m-d');
         $holiday->end_date = $end_date->format('Y-m-d');
         $holiday->reason = $reason;
+        $holiday->admin_id = $request->user()->id;
         $holiday->save();
 
         return redirect(route('holidays.index'));

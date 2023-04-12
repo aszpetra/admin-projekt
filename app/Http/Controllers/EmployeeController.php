@@ -84,6 +84,8 @@ class EmployeeController extends Controller
         $employee->is_efo = $is_efo;
         $employee->company_id = $company_id;
         $employee->user_id = $user->id;
+        $employee->admin_id = $request->user()->id;
+        $employee->is_active = true;
         $employee->save();
 
 

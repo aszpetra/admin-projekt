@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('shift_id');
             $table->integer('employee_id');
             $table->boolean('attended')->nullable();
+            $table->integer('admin_id');
             $table->timestamps();
         });
     }
