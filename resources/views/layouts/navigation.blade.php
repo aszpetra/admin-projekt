@@ -27,9 +27,6 @@
                     <x-nav-link :href="route('holidays.index')" :active="request()->routeIs('holidays.index')">
                         {{ __('Hiányzások') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('companies.index')" :active="request()->routeIs('companies.index')">
-                        {{ __('Cégek') }}
-                    </x-nav-link>
                 </div>
             </div>
 
@@ -50,7 +47,10 @@
 
                     <x-slot name="content">
                         <x-dropdown-link :href="route('profile.edit')">
-                            {{ __('Profile') }}
+                            {{ __('Profil') }}
+                        </x-dropdown-link>
+                        <x-dropdown-link :href="route('companies.index')">
+                            {{ __('Cégek') }}
                         </x-dropdown-link>
 
                         <!-- Authentication -->
@@ -60,7 +60,7 @@
                             <x-dropdown-link :href="route('logout')"
                                     onclick="event.preventDefault();
                                                 this.closest('form').submit();">
-                                {{ __('Log Out') }}
+                                {{ __('Kijelentkezés') }}
                             </x-dropdown-link>
                         </form>
                     </x-slot>

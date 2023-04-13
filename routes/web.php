@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\HolidayController;
@@ -43,9 +44,16 @@ Route::resource('shift_employee', ShiftEmployeeController::class)
     ->only(['index', 'store', 'create', 'edit', 'destroy', 'update', 'show'])
     ->middleware(['auth', 'verified']);
 
-Route::get('/dashboard', function () {
+Route::get('welcome', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])->name('welcome');
+
+Route::get('dashboard', function (){
     return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+})
+    ->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::post('/dashboard.selected', [DashboardController::class, 'selected'])
+    ->middleware(['auth', 'verified'])->name('dashboard.selected');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

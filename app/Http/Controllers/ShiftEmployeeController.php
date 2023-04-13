@@ -23,12 +23,17 @@ class ShiftEmployeeController extends Controller
 
     public function index(): View
     {
+        $company_id = session('company_id');
+        $current_user = Auth::id();
+
         $shifts = DB::table('shift_logs')
-            ->leftJoin('shifts', 'shifts.id', 'shift_logs.shift_id')
-            ->select('shift_logs.id', 'people', 'time', DB::raw('shifts.name'))
+            ->leftJoin('shifts', 'shifts.id', '=','shift_logs.shift_id')
+            ->select('shift_logs.id', 'people', 'time', DB::raw('shifts.name, shifts.company_id'))
+            ->where('shifts.company_id', '=', $company_id)
+            ->where('shift_logs.admin_id', '=', $current_user)
             ->get();
 
-        $current_user = Auth::id();
+
 
         return view('shift_employee.index', [
             'shifts' => $shifts
@@ -42,10 +47,14 @@ class ShiftEmployeeController extends Controller
     public function create(): View
     {
         $shift_id = $_GET['shift_id'];
+        $current_user = Auth::id();
+        $company_id = session('company_id');
 
         $users = DB::table('users')
-            ->select('id', 'name')
+            ->leftJoin('employees', 'employees.user_id', '=', 'users.id')
+            ->select('users.id', 'name')
             ->where('is_admin', "=", false)
+            ->where('employees.company_id', '=', $company_id)
             ->get();
 
         $shift = DB::table('shifts')
@@ -73,7 +82,7 @@ class ShiftEmployeeController extends Controller
         $shift_log->shift_id = $_GET['shift'];
         $shift_log->people = $request->people;
         $shift_log->time = $date->format('Y-m-d h:m');
-        $shift_log->admin_id = $request->user()->id;
+        $shift_log->admin_id = Auth::id();
         $shift_log->save();
 
         $size = count($request->employees);
@@ -83,7 +92,7 @@ class ShiftEmployeeController extends Controller
             $shift_employee = new Shift_employee();
             $shift_employee->shift_id = $shift_log->id;
             $shift_employee->employee_id = $employees[$i];
-            $shift_employee->admin_id = $request->user()->id;
+            $shift_employee->admin_id = Auth::id();
             $shift_employee->save();
         }
 

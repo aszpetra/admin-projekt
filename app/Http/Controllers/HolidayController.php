@@ -6,6 +6,7 @@ use App\Models\Holiday;
 use DateTime;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
@@ -18,9 +19,15 @@ class HolidayController extends Controller
      */
     public function index(): View
     {
+        $current_user = Auth::id();
+        $company_id = session('company_id');
+
         $holidays = DB::table('holidays')
             ->leftJoin('users', 'users.id', '=', 'holidays.employee_id')
+            ->leftJoin('employees', 'holidays.employee_id', '=', 'employees.user_id')
             ->select('*', DB::raw('users.name as employee, holidays.id as hol_id'))
+            ->where('employees.admin_id', '=', $current_user)
+            ->where('employees.company_id', '=', $company_id)
             ->get();
 
         return view('holidays.index', [
@@ -35,9 +42,14 @@ class HolidayController extends Controller
      */
     public function create()
     {
+        $current_user = Auth::id();
+        $company_id = session('company_id');
+
         $employees = DB::table('users')
-            ->select('name', 'id')
-            ->where('is_admin', '=', false)
+            ->leftJoin('employees', 'employees.user_id', '=', 'users.id')
+            ->select('users.name', 'users.id')
+            ->where('employees.company_id', '=', $company_id)
+            ->where('employees.admin_id', "=", $current_user)
             ->get();
 
         return view('holidays.create', [
@@ -90,6 +102,9 @@ class HolidayController extends Controller
      */
     public function edit(int $holiday_id): View
     {
+        $current_user = Auth::id();
+        $company_id = session('company_id');
+
         $holiday = DB::table('holidays')
             ->leftJoin('users', 'users.id', '=', 'holidays.employee_id')
             ->select('*', DB::raw('users.name as employee, holidays.id as hol_id'))
@@ -97,7 +112,10 @@ class HolidayController extends Controller
             ->get();
 
         $employees = DB::table('users')
+            ->leftJoin('employees', 'employees.user_id', '=', 'user.id')
             ->select('name', 'id')
+            ->where('employees.company_id', '=', $company_id)
+            ->where('employees.admin_id', "=", $current_user)
             ->get();
 
         return view('holidays.edit', [

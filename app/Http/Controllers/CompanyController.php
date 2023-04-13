@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
@@ -18,8 +19,14 @@ class CompanyController extends Controller
      */
     public function index(): View
     {
+        $current_user = Auth::id();
+        $companies = DB::table('companies')
+            ->select('id', 'name', 'admin_id')
+            ->where('admin_id', '=', $current_user)
+            ->get();
+
         return view('companies.index', [
-            'companies' => Company::all(),
+            'companies' => $companies,
         ]);
     }
 
@@ -49,10 +56,10 @@ class CompanyController extends Controller
 
         $company = new Company;
         $company->name = $name;
-        $company->admin_id = $request->user()->id;
+        $company->admin_id = Auth::id();
         $company->save();
 
-        return redirect(route('companies.index'));
+        return redirect(route('welcome'));
     }
 
     /**

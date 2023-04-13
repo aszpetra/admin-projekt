@@ -7,11 +7,13 @@ use App\Models\User;
 use DateTime;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\DB;
 
 class EmployeeController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      *
@@ -19,10 +21,15 @@ class EmployeeController extends Controller
      */
     public function index(): View
     {
+        $company_id = session('company_id');
+        $current_user = Auth::id();
+
         $employees = DB::table('employees')
             ->leftJoin('companies', 'employees.company_id', '=', 'companies.id')
             ->leftJoin('users', 'employees.user_id', '=', 'users.id')
             ->select('employees.*',  DB::raw('companies.name as company, users.name, users.email'))
+            ->where('employees.company_id', "=", $company_id)
+            ->where('employees.admin_id', '=', $current_user)
             ->orderBy('employees.id', 'asc')
             ->get();
 
@@ -38,13 +45,7 @@ class EmployeeController extends Controller
      */
     public function create(): View
     {
-        $companies = DB::table('companies')
-            ->select('id', 'name')
-            ->get();
-
-        return view('employees.newEmployee', [
-            'companies' => $companies,
-        ]);
+        return view('employees.newEmployee');
     }
 
     /**
@@ -61,7 +62,7 @@ class EmployeeController extends Controller
         $address = $request->address;
         $phone = $request->phone;
         $born_date = new DateTime($request->born_date);
-        $company_id = $request->company_id;
+        $company_id = session('company_id');
 
         if( $request->is_efo == 'efo') {
             $is_efo = true;

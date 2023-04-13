@@ -17,9 +17,12 @@ class ShiftController extends Controller
      */
     public function index(): View
     {
+        $company_id = session('company_id');
+
         $shifts = DB::table('shifts')
             ->leftJoin('companies', 'shifts.company_id', '=', 'companies.id')
             ->select('shifts.*',  DB::raw('companies.name as company'))
+            ->where('shifts.company_id', '=', $company_id)
             ->orderBy('shifts.id', 'asc')
             ->get();
 
@@ -35,13 +38,7 @@ class ShiftController extends Controller
      */
     public function create(): View
     {
-        $companies = DB::table('companies')
-            ->select('id', 'name')
-            ->get();
-
-        return view('shifts.create', [
-            'companies' => $companies,
-        ]);
+        return view('shifts.create');
     }
 
     /**

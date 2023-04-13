@@ -34,10 +34,10 @@
                 </div>
                 <div>
                     <label class="pl-2" for="company_id">Cég</label><br>
-                    <select name="company_id" id="company_id" class="pr-10 py-3 rounded-lg">
-                        @foreach($companies as $comp)
-                            <option value="{{$comp->id}}">{{$comp->name}}</option>
-                        @endforeach
+                    <select name="company_id" id="company_id" class="pr-10 py-3 rounded-lg" disabled>
+                        @php($comp_id = session('company_id'))
+                        @php($comp_name = session('company_name'))
+                        <option value="{{$comp_id}}">{{$comp_name}}</option>
                     </select>
                 </div>
                 <div>

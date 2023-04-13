@@ -10,10 +10,10 @@
             <div class="flex flex-col space-y-6">
                 <div>
                     <label class="pl-2" for="company_id">Cég:</label><br>
-                    <select name="company_id" id="company_id" class="pr-10 py-3 rounded-lg">
-                        @foreach($companies as $data)
-                            <option value="{{$data->id}}">{{$data->name}}</option>
-                        @endforeach
+                    <select name="company_id" id="company_id" class="pr-10 py-3 rounded-lg" disabled>
+                        @php($comp_id = session('company_id'))
+                        @php($comp_name = session('company_name'))
+                        <option value="{{$comp_id}}">{{$comp_name}}</option>
                     </select><br>
                     <label class="pl-2" for="name">Név</label><br>
                     <input class="pr-10 py-3 rounded-lg" type="text" name="name" placeholder="pl.: Húsfeldolgozó éjszakai" value="{{old('name')}}"><br>
