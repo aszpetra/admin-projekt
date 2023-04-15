@@ -7,6 +7,7 @@ use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ShiftEmployeeController;
+use App\Http\Controllers\ShiftLogController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -42,6 +43,10 @@ Route::resource('holidays', HolidayController::class)
 
 Route::resource('shift_employee', ShiftEmployeeController::class)
     ->only(['index', 'store', 'create', 'edit', 'destroy', 'update', 'show'])
+    ->middleware(['auth', 'verified']);
+
+Route::resource('shift_log', ShiftLogController::class)
+    ->only(['store', 'destroy'])
     ->middleware(['auth', 'verified']);
 
 Route::get('welcome', [DashboardController::class, 'index'])

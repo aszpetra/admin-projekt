@@ -49,7 +49,7 @@ class ShiftController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $company_id = $request->company_id;
+        $company_id = session('company_id');
         $name = $request->name;
         $work_hours =  $request->work_hours;
 

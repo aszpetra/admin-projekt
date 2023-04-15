@@ -5,10 +5,13 @@
         </h2>
     </x-slot>
     <div class="max-w-2xl mx-auto my-12 p-4 sm:p-6 lg:p-8 flex justify-center">
-
         <div class="py-7 flex justify-center">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <!--<div class="flex flex-col space-y-6 mt-8">-->
+                @if ($message = Session::get('success'))
+                    <div class="alert alert-success alert-block">
+                        <p> {{ \session::get('success')}} </p>
+                    </div>
+                @endif
                 <table class="min-w-full text-left text-sm font-light border border-collapse">
                     <thead class="border-b font-medium dark:border-neutral-200">
                     <tr>
@@ -44,10 +47,10 @@
                                         <x-dropdown-link :href="route('shift_employee.edit', $data->id)">
                                             {{ __('Beosztás szerkesztése') }}
                                         </x-dropdown-link>
-                                        <form method="POST" action="{{ route('shift_employee.destroy', $data->id) }}">
+                                        <form method="POST" action="{{ route('shift_log.destroy', $data->id) }}">
                                             @csrf
                                             @method('delete')
-                                            <x-dropdown-link :href="route('shift_employee.destroy', ['shift_employee' => $data->id])" onclick="event.preventDefault(); this.closest('form').submit();">
+                                            <x-dropdown-link :href="route('shift_log.destroy', ['shift_log' => $data->id])" onclick="event.preventDefault(); this.closest('form').submit();">
                                                 {{ __('Töröl') }}
                                             </x-dropdown-link>
                                         </form>

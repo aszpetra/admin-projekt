@@ -5,7 +5,7 @@
         </h2>
     </x-slot>
     <div class="max-w-2xl mx-auto my-12 p-4 sm:p-6 lg:p-8 flex justify-center">
-        <form method="POST" action="{{ route('shift_employee.store', ['shift' => $shift->id]) }}">
+        <form method="POST" action="{{ route('shift_log.store', ['shift' => $shift->id]) }}">
             @csrf
             <div class="flex flex-col space-y-6">
                 <div>
@@ -20,14 +20,6 @@
                 <div>
                     <label class="pl-2" for="people">Létszám</label><br>
                     <input type="number" name="people" class="pr-10 py-3 rounded-lg" placeholder="Létszám" value="{{old('people')}}"/>
-                </div>
-                <div>
-                    <label class="pl-2" >Dolgozók</label><br>
-                    @php($i=0)
-                    @foreach($users as $data)
-                        <input type="checkbox" name="employees[]" value="{{$data->id}}" class="px-2 py-2 m-2 rounded-lg mountain-dark-500">
-                        <label>{{$data->name}}</label><br>
-                    @endforeach
                 </div>
             </div>
             <div>

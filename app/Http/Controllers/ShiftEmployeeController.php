@@ -47,15 +47,6 @@ class ShiftEmployeeController extends Controller
     public function create(): View
     {
         $shift_id = $_GET['shift_id'];
-        $current_user = Auth::id();
-        $company_id = session('company_id');
-
-        $users = DB::table('users')
-            ->leftJoin('employees', 'employees.user_id', '=', 'users.id')
-            ->select('users.id', 'name')
-            ->where('is_admin', "=", false)
-            ->where('employees.company_id', '=', $company_id)
-            ->get();
 
         $shift = DB::table('shifts')
             ->select('id', 'name')
@@ -64,7 +55,6 @@ class ShiftEmployeeController extends Controller
 
         return view('shift_employee.create', [
             'shift' => $shift,
-            'users' => $users,
         ]);
     }
 
@@ -72,42 +62,42 @@ class ShiftEmployeeController extends Controller
      * Store a newly created resource in storage.
      *
      * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\View\View
      */
     public function store(Request $request): RedirectResponse
     {
-        $date = new DateTime($request->date);
-
-        $shift_log = new Shift_log();
-        $shift_log->shift_id = $_GET['shift'];
-        $shift_log->people = $request->people;
-        $shift_log->time = $date->format('Y-m-d h:m');
-        $shift_log->admin_id = Auth::id();
-        $shift_log->save();
-
         $size = count($request->employees);
         $employees = $request->employees;
 
         for ($i = 0; $i < $size; $i++) {
             $shift_employee = new Shift_employee();
-            $shift_employee->shift_id = $shift_log->id;
+            $shift_employee->shift_id = $request->shift;
             $shift_employee->employee_id = $employees[$i];
             $shift_employee->admin_id = Auth::id();
             $shift_employee->save();
         }
 
-        return redirect(route('shift_employee.index'));
+        return redirect(route('shift_employee.index'))->with('success', 'Sikeresen létrehozva!');
     }
 
     /**
      * Display the specified resource.
      *
-     * @param \App\Models\Shift_employee $shift_employee
+     * @param integer $shift_id
      * @return \Illuminate\Http\Response
      */
-    public function show(Shift_employee $shift_employee): View
+    public function show(int $shift_id): View
     {
-        return view('shift_employee.show');
+        $employees = DB::table('shift_employees')
+            ->leftJoin('users', 'users.id', '=', 'shift_employees.employee_id')
+            ->select('shift_id', 'employee_id', 'admin_id', 'users.name')
+            ->where('admin_id', '=', Auth::id())
+            ->where('shift_id', '=', $shift_id)
+            ->get();
+
+        return view('shift_employee.show', [
+            'employees' => $employees
+        ]);
     }
 
     /**
@@ -163,7 +153,7 @@ class ShiftEmployeeController extends Controller
      * @param \App\Models\Shift_employee $shift_employee
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Shift_employee $shift_employee)
+    public function destroy(Shift_employee $shift_employee): RedirectResponse
     {
 
     }
