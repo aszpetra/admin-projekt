@@ -11,8 +11,12 @@
             <!--<div class="flex flex-col space-y-6 mt-8">-->
             <div class="my-7">
                 <a href="{{ route('employees.create') }}"
-                   class="bg-mountain-light p-4 rounded-lg hover:bg-mountain-dark transition duration-300 ease-in-out">
+                   class="bg-mountain-light m-2 p-4 rounded-lg hover:bg-mountain-dark transition duration-300 ease-in-out">
                     Új hozzáadása
+                </a>
+                <a href="{{url('all_employees')}}"
+                   class="bg-mountain-light m-2 p-4 rounded-lg hover:bg-mountain-dark transition duration-300 ease-in-out">
+                    Összes dolgozó
                 </a>
             </div>
             <table class="min-w-full text-left text-sm font-light border border-collapse table-auto">
@@ -25,8 +29,6 @@
                         <th class="px-3 py-4">Cím</th>
                         <th class="px-3 py-4">Telefon szám</th>
                         <th class="px-3 py-4">Születési dátum</th>
-                        <th class="px-3 py-4">Cég</th>
-                        <th class="px-3 py-4">Munkaviszony</th>
                         <th class="px-3 py-4"></th>
                     </tr>
                 </thead>
@@ -40,12 +42,6 @@
                         <td class="whitespace-nowrap px-3 py-4">{{$data->address}}</td>
                         <td class="whitespace-nowrap px-3 py-4">{{$data->phone}}</td>
                         <td class="whitespace-nowrap px-3 py-4">{{ date('Y-m-d',strtotime($data->born_date)) }}</td>
-                        <td class="whitespace-nowrap px-3 py-4">{{$data->company}}</td>
-                        @if($data->is_efo == 1)
-                            <td class="whitespace-nowrap px-3 py-4">EFO</td>
-                        @else
-                            <td class="whitespace-nowrap px-3 py-4">Jogviszonyos</td>
-                        @endif
                         <td class="whitespace-nowrap px-3 py-4">
                             <x-dropdown>
                                 <x-slot name="trigger">

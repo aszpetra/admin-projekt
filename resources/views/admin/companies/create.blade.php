@@ -18,7 +18,7 @@
                     {{ __('Mentés') }}
                 </x-primary-button>
                 <x-secondary-button class="mt-4 bg-white p-4 rounded-lg hover:bg-mountain-light hover:text-white transition duration-300 ease-in-out"
-                                    onClick="window.location='{{ URL::route('companies.index') }}'">
+                                    onClick="window.location='{{ URL::route('welcome') }}'">
                     {{ __('Vissza') }}
                 </x-secondary-button>
             </div>

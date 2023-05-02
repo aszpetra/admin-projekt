@@ -18,7 +18,7 @@
                         <th class="px-6 py-4">ID</th>
                         <th class="px-6 py-4">Részleg</th>
                         <th class="px-6 py-4">Létszám</th>
-                        <th class="px-6 py-4">Dátum</th>
+                        <th class="px-6 py-4">Kezdés</th>
                         <th class="px-6 py-4"></th>
                     </tr>
                     </thead>
@@ -30,7 +30,7 @@
                             <td class="whitespace-nowrap px-6 py-4">{{$data->id}}</td>
                             <td class="whitespace-nowrap px-6 py-4">{{$data->name}}</td>
                             <td class="whitespace-nowrap px-6 py-4">{{$data->people}}</td>
-                            <td class="whitespace-nowrap px-6 py-4">{{$data->time}}</td>
+                            <td class="whitespace-nowrap px-6 py-4">{{$data->start}}</td>
                             <td class="whitespace-nowrap px-6 py-4">
                                 <x-dropdown>
                                     <x-slot name="trigger">

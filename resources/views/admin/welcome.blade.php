@@ -73,18 +73,19 @@
                             </a>
                         </div>
                     </div>
-                @else
-                    <div>
-                        <a href="{{ route('login') }}">Bejelentkezés</a>
-                    </div>
+            @else
+                <div>
+                    <a href="{{ route('login') }}">Bejelentkezés</a>
+                </div>
 
-                    @if (Route::has('register'))
-                        <div>
-                            <a href="{{ route('register') }}">Regisztráció</a>
-                        </div>
-                    @endif
-                @endauth
-            </div>
+                @if (Route::has('register'))
+                    <div>
+                        <a href="{{ route('register') }}">Regisztráció</a>
+                    </div>
+                @endif
+            @endauth
+        </div>
+
         @endif
     </body>
 
