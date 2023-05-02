@@ -17,7 +17,8 @@ return new class extends Migration
             $table->id();
             $table->integer('shift_id');
             $table->integer('people');
-            $table->DateTime('time');
+            $table->DateTime('start');
+            $table->DateTime('end');
             $table->integer('admin_id');
             $table->timestamps();
         });

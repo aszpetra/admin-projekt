@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('type');
             $table->string('reason')->nullable();
             $table->integer('admin_id');
+            $table->boolean('approved');
             $table->timestamps();
         });
     }

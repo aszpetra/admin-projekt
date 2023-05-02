@@ -20,8 +20,8 @@ return new class extends Migration
             $table->string('phone');
             $table->string('city');
             $table->string('address')->nullable();
+            $table->integer('days');
             $table->integer('company_id');
-            $table->boolean('is_efo');
             $table->integer('admin_id');
             $table->boolean('is_active');
             $table->timestamps();
