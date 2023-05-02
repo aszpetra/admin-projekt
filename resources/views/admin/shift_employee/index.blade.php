@@ -12,6 +12,67 @@
                         <p> {{ \session::get('success')}} </p>
                     </div>
                 @endif
+                <div>
+                    <h2 class="p-4 font-semibold text-lg">
+                        Aktuális
+                    </h2>
+                </div>
+                <table class="mb-16 min-w-full text-left text-sm font-light border border-collapse">
+                    <thead class="border-b font-medium dark:border-neutral-200">
+                    <tr>
+                        <th class="px-6 py-4">ID</th>
+                        <th class="px-6 py-4">Részleg</th>
+                        <th class="px-6 py-4">Létszám</th>
+                        <th class="px-6 py-4">Kezdés</th>
+                        <th class="px-6 py-4">Vége</th>
+                        <th class="px-6 py-4"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($shifts_future as $data)
+                        <tr
+                            class="border-b transition duration-300 ease-in-out hover:bg-zinc-200 dark:border-neutral-200 dark:hover:bg-zinc-400 hover:text-gray-100"
+                        >
+                            <td class="whitespace-nowrap px-6 py-4">{{$data->id}}</td>
+                            <td class="whitespace-nowrap px-6 py-4">{{$data->name}}</td>
+                            <td class="whitespace-nowrap px-6 py-4">{{$data->people}}</td>
+                            <td class="whitespace-nowrap px-6 py-4">{{Carbon\Carbon::create($data->start)->toDateTimeString()}}</td>
+                            <td class="whitespace-nowrap px-6 py-4">{{Carbon\Carbon::create($data->end)->toDateTimeString()}}</td>
+                            <td class="whitespace-nowrap px-6 py-4">
+                                <x-dropdown>
+                                    <x-slot name="trigger">
+                                        <button>
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                                                <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
+                                            </svg>
+                                        </button>
+                                    </x-slot>
+                                    <x-slot name="content">
+                                        <x-dropdown-link :href="route('shift_employee.show', $data->id)">
+                                            {{ __('Névsor') }}
+                                        </x-dropdown-link>
+                                        <x-dropdown-link :href="route('shift_employee.edit', $data->id)">
+                                            {{ __('Beosztás szerkesztése') }}
+                                        </x-dropdown-link>
+                                        <form method="POST" action="{{ route('shift_log.destroy', $data->id) }}">
+                                            @csrf
+                                            @method('delete')
+                                            <x-dropdown-link :href="route('shift_log.destroy', ['shift_log' => $data->id])" onclick="event.preventDefault(); this.closest('form').submit();">
+                                                {{ __('Töröl') }}
+                                            </x-dropdown-link>
+                                        </form>
+                                    </x-slot>
+                                </x-dropdown>
+                            </td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+                <div>
+                    <h2 class="p-4 font-semibold text-lg">
+                        Lezajlott műszakok
+                    </h2>
+                </div>
                 <table class="min-w-full text-left text-sm font-light border border-collapse">
                     <thead class="border-b font-medium dark:border-neutral-200">
                     <tr>
@@ -19,18 +80,20 @@
                         <th class="px-6 py-4">Részleg</th>
                         <th class="px-6 py-4">Létszám</th>
                         <th class="px-6 py-4">Kezdés</th>
+                        <th class="px-6 py-4">Vége</th>
                         <th class="px-6 py-4"></th>
                     </tr>
                     </thead>
                     <tbody>
-                    @foreach($shifts as $data)
+                    @foreach($shifts_past as $data)
                         <tr
                             class="border-b transition duration-300 ease-in-out hover:bg-zinc-200 dark:border-neutral-200 dark:hover:bg-zinc-400 hover:text-gray-100"
                         >
                             <td class="whitespace-nowrap px-6 py-4">{{$data->id}}</td>
                             <td class="whitespace-nowrap px-6 py-4">{{$data->name}}</td>
                             <td class="whitespace-nowrap px-6 py-4">{{$data->people}}</td>
-                            <td class="whitespace-nowrap px-6 py-4">{{$data->start}}</td>
+                            <td class="whitespace-nowrap px-6 py-4">{{Carbon\Carbon::create($data->start)->toDateTimeString()}}</td>
+                            <td class="whitespace-nowrap px-6 py-4">{{Carbon\Carbon::create($data->end)->toDateTimeString()}}</td>
                             <td class="whitespace-nowrap px-6 py-4">
                                 <x-dropdown>
                                     <x-slot name="trigger">

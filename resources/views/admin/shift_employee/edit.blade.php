@@ -15,7 +15,7 @@
                 </div>
                 <div>
                     <label class="pl-2" for="time">Műszak kezdete</label><br>
-                    <input name="time" type="datetime-local" class="pr-10 py-3 rounded-lg" value="{{ date('Y-m-d h:m:s',strtotime($shift->time)) }}"/>
+                    <input name="time" type="datetime-local" class="pr-10 py-3 rounded-lg" value="{{ Carbon\Carbon::create($shift->start)->toDateTimeString() }}"/>
                 </div>
                 <div>
                     <label class="pl-2" for="people">Létszám</label><br>
@@ -23,11 +23,15 @@
                 </div>
                 <div>
                     <label class="pl-2" >Dolgozók</label><br>
-                    @php($i=0)
-                    @foreach($employees as $data)
-                        <input type="checkbox" name="employees[]" value="{{$data->employee_id}}" class="px-2 py-2 m-2 rounded-lg mountain-dark-500" checked>
+                    @foreach($checked_employees as $data)
+                        <input type="checkbox" name="original_employees[]" value="{{$data->id}}" class="px-2 py-2 m-2 rounded-lg mountain-dark-500" checked>
                         <label>{{$data->name}}</label><br>
                     @endforeach
+                    @foreach($employees as $emp)
+                        <input type="checkbox" name="other_employees[]" value="{{$emp->id}}" class="px-2 py-2 m-2 rounded-lg mountain-dark-500">
+                        <label>{{$emp->name}}</label><br>
+                    @endforeach
+
                 </div>
             </div>
             <div>

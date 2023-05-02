@@ -26,7 +26,7 @@ class ShiftController extends Controller
             ->orderBy('shifts.id', 'asc')
             ->get();
 
-        return view('shifts.index', [
+        return view('admin.shifts.index', [
             'shifts' => $shifts,
         ]);
     }
@@ -38,7 +38,7 @@ class ShiftController extends Controller
      */
     public function create(): View
     {
-        return view('shifts.create');
+        return view('admin.shifts.create');
     }
 
     /**
@@ -91,7 +91,7 @@ class ShiftController extends Controller
             ->select('id', 'name')
             ->get();
 
-        return view('shifts.edit', [
+        return view('admin.shifts.edit', [
             'shift' => $shift,
             'companies' => $companies,
         ]);

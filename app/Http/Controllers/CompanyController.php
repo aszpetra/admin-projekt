@@ -25,7 +25,7 @@ class CompanyController extends Controller
             ->where('admin_id', '=', $current_user)
             ->get();
 
-        return view('companies.index', [
+        return view('admin.companies.index', [
             'companies' => $companies,
         ]);
     }
@@ -37,7 +37,7 @@ class CompanyController extends Controller
      */
     public function create(): View
     {
-        return view('companies.create');
+        return view('admin.companies.create');
     }
 
     /**
@@ -87,7 +87,7 @@ class CompanyController extends Controller
             ->where('companies.id', '=', $company_id)
             ->first();
 
-        return view('companies.edit', [
+        return view('admin.companies.edit', [
             'company' => $company,
         ]);
     }
@@ -107,7 +107,7 @@ class CompanyController extends Controller
 
         $company->update($attributes);
 
-        return redirect(route('companies.index'));
+        return redirect(route('admin.companies.index'));
     }
 
     /**
@@ -120,6 +120,6 @@ class CompanyController extends Controller
     {
         $company->delete();
 
-        return redirect(route('companies.index'));
+        return redirect(route('admin.companies.index'));
     }
 }

@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Shift_log;
+use Carbon\Carbon;
 use DateTime;
+use http\Client\Response;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
@@ -11,6 +14,11 @@ use Illuminate\Support\Facades\Auth;
 
 class ShiftLogController extends Controller
 {
+
+    public function __construct()
+    {
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -39,28 +47,108 @@ class ShiftLogController extends Controller
      */
     public function store(Request $request): View
     {
-        $current_user = Auth::id();
-        $company_id = session('company_id');
-        $date = new DateTime($request->date);
+        $shift = DB::table('shifts')
+            ->select('*')
+            ->where('id', '=', $_GET['shift'])
+            ->first();
 
+        $date = Carbon::create($request->date);
+        $end_date = Carbon::create($date);
         $shift_log = new Shift_log();
         $shift_log->shift_id = $_GET['shift'];
         $shift_log->people = $request->people;
-        $shift_log->time = $date->format('Y-m-d h:m');
+        $shift_log->start = $date->toDateTime();
+        $shift_log->end = $end_date->addHours($shift->work_hours);
         $shift_log->admin_id = Auth::id();
         $shift_log->save();
+
+        $available_emp = $this->available_employees($shift_log->id);
+
+        return view('admin.shift_employee.employees', [
+            'shift_log' => $shift_log,
+            'users' => $available_emp,
+        ]);
+    }
+
+    public function available_employees($shift_log_id)
+    {
+        $company_id = session('company_id');
+        $available_emp = [];
+
+        $shift_log = DB::table('shift_logs')
+            ->select('*')
+            ->where('id', '=', $shift_log_id)
+            ->first();
 
         $users = DB::table('users')
             ->leftJoin('employees', 'employees.user_id', '=', 'users.id')
             ->select('users.id', 'name')
             ->where('is_admin', "=", false)
             ->where('employees.company_id', '=', $company_id)
+            ->orderBy('days', 'ASC')
             ->get();
 
-        return view('shift_employee.employees', [
-            'shift_log' => $shift_log,
-            'users' => $users,
-        ]);
+        foreach ($users as $user) {
+
+            $employee = DB::table('employees')
+                ->where('user_id', '=', $user->id)
+                ->first();
+
+            if($employee->is_active){
+
+                $prev_shift = DB::table('shift_logs')
+                    ->leftJoin('shift_employees', 'shift_employees.shift_id', '=', 'shift_logs.id')
+                    ->select('end', 'start')
+                    ->where('shift_employees.employee_id', '=', $user->id)
+                    ->where('shift_logs.start', '<=', $shift_log->start)
+                    ->orderBy('end', 'DESC')
+                    ->get();
+
+                $next_shift = DB::table('shift_logs')
+                    ->leftJoin('shift_employees', 'shift_employees.shift_id', '=', 'shift_logs.id')
+                    ->select('*')
+                    ->where('shift_employees.employee_id', '=', $user->id)
+                    ->where('shift_logs.start', '>=', $shift_log->start)
+                    ->orderBy('end', 'ASC')
+                    ->get();
+                $holiday = DB::table('holidays')
+                    ->select('start_date', 'end_date')
+                    ->where('employee_id', '=', $user->id)
+                    ->where('start_date', '<=', $shift_log->start)
+                    ->where('end_date', '>=', $shift_log->start)
+                    ->first();
+
+                if(empty($holiday)){
+
+                    if(!empty($prev_shift->first() && $prev_shift->first()->start != $shift_log->start)){
+                        $this_start = Carbon::create($shift_log->start);
+                        $last_end = Carbon::create($prev_shift[0]->end);
+                        $subtract_prev = $last_end->diffInHours($this_start);
+
+                        if($subtract_prev > 8 ){
+                            if ($employee->days < 15){
+                                if(!empty($next_shift->first())){
+                                    $this_end =  Carbon::create($shift_log->end);
+                                    $next_start = Carbon::create($next_shift[0]->start);
+                                    $subtract_next = $next_start->diffInHours($this_end);
+                                    if($subtract_next > 8){
+                                        array_push($available_emp, $user);
+                                    }
+                                }else {
+                                    array_push($available_emp, $user);
+                                }
+                            }
+                        }
+                    } else {
+                        if($prev_shift->first()->start != $shift_log->start){
+                            array_push($available_emp, $user);
+                        }
+                    }
+                }
+            }
+        }
+
+        return $available_emp;
     }
 
     /**
@@ -105,8 +193,50 @@ class ShiftLogController extends Controller
      */
     public function destroy(Shift_log $shift_log)
     {
+        $shift_employees = DB::table('shift_employees')
+            ->select('*')
+            ->where('shift_id', '=', $shift_log->id)
+            ->get();
+
+        if($shift_employees != null){
+            foreach($shift_employees as $shift_employee)
+                $employee = DB::table('employees')
+                    ->where('user_id', '=', $shift_employee->employee_id)
+                    ->first();
+
+            if (isset($shift_employee)) {
+                if (isset($employee)) {
+                    DB::table('employees')
+                        ->where('user_id', '=', $shift_employee->employee_id)
+                        ->update(['days' => $employee->days - 1]);
+                }
+
+                DB::table('shift_employees')
+                    ->where('id', '=', $shift_employee->id)
+                    ->delete();
+            }
+        }
+
         $shift_log->delete();
 
         return redirect(route('shift_employee.index'))->with('success','Törölve');
+    }
+
+    public function calendarEvents(Request $request): JsonResponse
+    {
+        $company_id = session('company_id');
+        $current_user = Auth::id();
+        $start = $request->query('start');
+        $end = $request->query('end');
+
+        $shifts = DB::table("shift_logs")
+            ->leftJoin("shifts", "shifts.id", "=", "shift_logs.shift_id")
+            ->select(DB::raw("shifts.name as title, shift_logs.start, shift_logs.end"))
+            ->where("shifts.company_id", "=", $company_id)
+            ->where("shift_logs.admin_id", "=", $current_user)
+            ->whereBetween("start", [$start, $end])
+            ->get();
+
+        return response()->json($shifts);
     }
 }
