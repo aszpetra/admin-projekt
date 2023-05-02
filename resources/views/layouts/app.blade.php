@@ -16,8 +16,11 @@
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100">
+            @if(Route::is('home'))
+                @include('layouts.employee_nav')
+            @else
                 @include('layouts.navigation')
-
+            @endif
             <!-- Page Heading -->
             @if (isset($header))
                 <header class="bg-white shadow">
