@@ -30,7 +30,7 @@ class HolidayController extends Controller
             ->where('employees.company_id', '=', $company_id)
             ->get();
 
-        return view('holidays.index', [
+        return view('admin.holidays.index', [
             'holidays' => $holidays,
         ]);
     }
@@ -52,7 +52,7 @@ class HolidayController extends Controller
             ->where('employees.admin_id', "=", $current_user)
             ->get();
 
-        return view('holidays.create', [
+        return view('admin.holidays.create', [
             'employees' => $employees,
         ]);
     }
@@ -78,6 +78,7 @@ class HolidayController extends Controller
         $holiday->end_date = $end_date->format('Y-m-d');
         $holiday->reason = $reason;
         $holiday->admin_id = $request->user()->id;
+        $holiday->approved = true;
         $holiday->save();
 
         return redirect(route('holidays.index'));
@@ -112,13 +113,13 @@ class HolidayController extends Controller
             ->get();
 
         $employees = DB::table('users')
-            ->leftJoin('employees', 'employees.user_id', '=', 'user.id')
-            ->select('name', 'id')
+            ->leftJoin('employees', 'employees.user_id', '=', 'users.id')
+            ->select('name', 'users.id')
             ->where('employees.company_id', '=', $company_id)
             ->where('employees.admin_id', "=", $current_user)
             ->get();
 
-        return view('holidays.edit', [
+        return view('admin.holidays.edit', [
             'holiday' => $holiday,
             'employees' => $employees,
         ]);
@@ -133,13 +134,23 @@ class HolidayController extends Controller
      */
     public function update(Request $request, Holiday $holiday): RedirectResponse
     {
+
+        if($request->approved == "yes"){
+            $approved = true;
+        }else {
+            $approved = false;
+        }
+
         $attributes = [
             'type' => $request->type,
             'employee_id' => $request->employee_id,
             'start_date' => new DateTime($request->start_date),
             'end_date' => new DateTime($request->end_date),
             'reason' => $request->reason,
+            'approved' => $approved,
         ];
+
+        //dd($holiday);
 
         $holiday->update($attributes);
 

@@ -14,6 +14,7 @@ class Holiday extends Model
         'reason',
         'start_date',
         'end_date',
-        'employee_id'
+        'employee_id',
+        'approved'
     ];
 }

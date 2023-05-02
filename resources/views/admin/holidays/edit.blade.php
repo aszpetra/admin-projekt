@@ -58,6 +58,19 @@
                     <label class="pl-2" for="reason">Indoklás (opcionális)</label><br>
                     <input class="rounded-lg" type="text" name="reason" placeholder="Indoklás" value="{{$holiday[0]->reason}}"><br>
                 </div>
+                <div>
+                    @if($holiday[0]->approved)
+                        <input type="radio" id="is_approved" name="approved" value="yes" checked>
+                        <label for="is_approved">Jóváhagyott</label><br>
+                        <input type="radio" id="not_approved" name="approved" value="no">
+                        <label for="not_approved">Kérvényezett</label><br>
+                    @else
+                        <input type="radio" id="is_approved" name="approved" value="yes">
+                        <label for="is_approved">Jóváhagyott</label><br>
+                        <input type="radio" id="not_approved" name="approved" value="no" checked>
+                        <label for="not_approved">Kérvényezett</label><br>
+                    @endif
+                </div>
             </div>
             <div>
                 <x-primary-button class="mt-4 bg-mountain-light p-4 rounded-lg hover:bg-mountain-dark hover:text-white transition duration-300 ease-in-out">
