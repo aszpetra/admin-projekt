@@ -140,7 +140,7 @@ class ShiftLogController extends Controller
                             }
                         }
                     } else {
-                        if($prev_shift->first()->start != $shift_log->start){
+                        if(empty($prev_shift->first())) {
                             array_push($available_emp, $user);
                         }
                     }

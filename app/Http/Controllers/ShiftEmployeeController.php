@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use function PHPUnit\Framework\isEmpty;
 
 class ShiftEmployeeController extends Controller
 {
@@ -221,7 +222,7 @@ class ShiftEmployeeController extends Controller
                             }
                         }
                     } else {
-                        if($prev_shift->first()->start != $shift_log->start){
+                        if(empty($prev_shift->first())) {
                             array_push($available_emp, $user);
                         }
                     }
@@ -242,7 +243,65 @@ class ShiftEmployeeController extends Controller
     public function update(Request $request, Shift_log $shift_employee): RedirectResponse
     {
         $time = Carbon::create($request->time);
+        $employees = DB::table('shift_employees')
+            ->select('*')
+            ->where('shift_id', '=', $shift_employee->id)
+            ->get();
 
+        $checked_employees = $request->original_employees;
+        $changed_employees = $request->other_employees;
+        $emp_ids = [];
+
+        if(!empty($checked_employees)){
+
+            foreach($checked_employees as $emp)
+            {
+                array_push($emp_ids, $emp);
+            }
+            foreach ($employees as $emp)
+            {
+                $tmp = array_search($emp->employee_id, $emp_ids);
+
+                if(gettype($tmp) == "boolean"){
+                    DB::table('shift_employees')
+                        ->where('employee_id', '=', $emp->employee_id)
+                        ->where('shift_id', '=', $emp->shift_id)
+                        ->delete();
+                }
+            }
+        }else {
+            foreach($employees as $emp){
+                DB::table('shift_employees')
+                    ->where('employee_id', '=', $emp->employee_id)
+                    ->where('shift_id', '=', $emp->shift_id)
+                    ->delete();
+            }
+        }
+
+
+        if(!empty($changed_employees)){
+            foreach ($changed_employees as $emp){
+
+                $shift_emp = new Shift_employee();
+                $shift_emp->shift_id = $shift_employee->id;
+                $shift_emp->employee_id = intval($emp);
+                $shift_emp->admin_id = Auth::id();
+                $shift_emp->save();
+
+                $employee = DB::table('employees')
+                    ->select('days')
+                    ->where('user_id', '=', $shift_emp->employee_id)
+                    ->first();
+
+                $attr = [
+                    'days' => $employee->days + 1,
+                ];
+
+                DB::table('employees')
+                    ->where('user_id', '=', $shift_emp->employee_id)
+                    ->update($attr);
+            }
+        }
 
         $attributes = [
             'people' => $request->people,
@@ -263,7 +322,21 @@ class ShiftEmployeeController extends Controller
     public function destroy(Shift_employee $shift_employee): RedirectResponse
     {
 
+        $employee = DB::table('employees')
+            ->where('user_id', '=', $shift_employee->employee_id)
+            ->first();
+
+        $attributes = [
+            'days' => $employee->days - 1,
+        ];
+
+        DB::table('employees')
+            ->where('user_id', '=', $employee->user_id)
+            ->update($attributes);
+
         $shift_employee->delete();
+
+        return redirect(route('shift_employee.index'));
 
     }
 }
