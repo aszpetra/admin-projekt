@@ -25,6 +25,9 @@ class Employee extends Model implements CanResetPassword
         'phone',
         'city',
         'address',
+        'casual_days',
+        'seasonal_days',
+        'type',
         'company_id',
         'is_active'
     ];

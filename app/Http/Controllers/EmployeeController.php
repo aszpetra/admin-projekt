@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\DB;
+use mysql_xdevapi\Exception;
 
 class EmployeeController extends Controller
 {
@@ -67,12 +68,7 @@ class EmployeeController extends Controller
         $phone = $request->phone;
         $born_date = new DateTime($request->born_date);
         $company_id = session('company_id');
-
-        if( $request->is_efo == 'efo') {
-            $is_efo = true;
-        } else {
-            $is_efo = false;
-        }
+        $type = $request->type;
 
         $user = new User();
         $user->email = $email;
@@ -86,7 +82,9 @@ class EmployeeController extends Controller
         $employee->address = $address;
         $employee->phone = $phone;
         $employee->born_date = $born_date->format('Y-m-d');
-        $employee->days = 0;
+        $employee->casual_days = 0;
+        $employee->seasonal_days = 0;
+        $employee->type = $type;
         $employee->company_id = $company_id;
         $employee->user_id = $user->id;
         $employee->admin_id = $request->user()->id;
@@ -94,7 +92,7 @@ class EmployeeController extends Controller
         $employee->save();
 
         $token = Password::createToken($user);
-        //$user->sendPasswordResetNotification($token);
+        $user->sendPasswordResetNotification($token);
 
         return redirect(route('employees.index'));
     }
@@ -184,6 +182,7 @@ class EmployeeController extends Controller
             'born_date' => $born_date->format('Y-m-d'),
             'city' => $request->city,
             'address' => $request->address,
+            'type' => $request->type
         ];
 
         $employee->update($attributes);

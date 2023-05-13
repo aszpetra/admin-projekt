@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
         plugins: [dayGridPlugin],
         initialView: 'dayGridMonth',
         locales: [ huLocale ],
+        height: 'auto',
         events: async (fetchInfo) => {
             const response = await axios.get('/events', {
                 params: {

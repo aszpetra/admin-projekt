@@ -21,7 +21,8 @@
                     <th class="px-3 py-4">ID</th>
                     <th class="px-3 py-4">Név</th>
                     <th class="px-3 py-4">Cég</th>
-                    <th class="px-3 py-4">Ledolgozott napok</th>
+                    <th class="px-3 py-4">Alkalmi munka</th>
+                    <th class="px-3 py-4">Idénymunka</th>
                     <th class="px-3 py-4">Aktív</th>
                     <th class="px-3 py-4"></th>
                 </tr>
@@ -32,7 +33,8 @@
                         <td class="whitespace-nowrap px-3 py-4">{{$data->id}}</td>
                         <td class="whitespace-nowrap px-3 py-4">{{$data->name}}</td>
                         <td class="whitespace-nowrap px-3 py-4">{{$data->company}}</td>
-                        <td class="whitespace-nowrap px-3 py-4">{{$data->days}}</td>
+                        <td class="whitespace-nowrap px-3 py-4">{{$data->casual_days}}</td>
+                        <td class="whitespace-nowrap px-3 py-4">{{$data->seasonal_days}}</td>
                         <td class="whitespace-nowrap px-3 py-4">
                             @if ($data->is_active)
                                 Aktív

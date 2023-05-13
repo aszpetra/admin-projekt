@@ -20,7 +20,9 @@ return new class extends Migration
             $table->string('phone');
             $table->string('city');
             $table->string('address')->nullable();
-            $table->integer('days');
+            $table->integer('seasonal_days');
+            $table->integer('casual_days');
+            $table->string('type');
             $table->integer('company_id');
             $table->integer('admin_id');
             $table->boolean('is_active');

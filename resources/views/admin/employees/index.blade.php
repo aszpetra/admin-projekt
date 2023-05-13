@@ -25,6 +25,7 @@
                         <th class="px-3 py-4">ID</th>
                         <th class="px-3 py-4">Név</th>
                         <th class="px-3 py-4">E-mail</th>
+                        <th class="px-3 py-4">Munkaviszony</th>
                         <th class="px-3 py-4">Város</th>
                         <th class="px-3 py-4">Cím</th>
                         <th class="px-3 py-4">Telefon szám</th>
@@ -38,6 +39,13 @@
                         <td class="whitespace-nowrap px-3 py-4">{{$data->id}}</td>
                         <td class="whitespace-nowrap px-3 py-4">{{$data->name}}</td>
                         <td class="whitespace-nowrap px-3 py-4">{{$data->email}}</td>
+                        <td class="whitespace-nowrap px-3 py-4">
+                            @if($data->type == "casual")
+                                Alkalmi munka
+                            @else
+                                Idénymunka
+                            @endif
+                        </td>
                         <td class="whitespace-nowrap px-3 py-4">{{$data->city}}</td>
                         <td class="whitespace-nowrap px-3 py-4">{{$data->address}}</td>
                         <td class="whitespace-nowrap px-3 py-4">{{$data->phone}}</td>
@@ -52,7 +60,6 @@
                                     </button>
                                 </x-slot>
                                 <x-slot name="content">
-
                                     <x-dropdown-link :href="route('employees.edit', $data->id)">
                                         {{ __('Szerkeszt') }}
                                     </x-dropdown-link>

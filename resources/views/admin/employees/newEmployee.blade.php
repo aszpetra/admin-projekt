@@ -33,6 +33,13 @@
                     <input class="rounded-lg" type="date" name="born_date" value="{{old('born_date')}}">
                 </div>
                 <div>
+                    <label class="pl-2" for="type">Foglalkoztatás típusa:</label><br>
+                    <select name="type" id="type" class="pr-10 py-3 rounded-lg">
+                        <option value="casual">Alkalmi munka</option>
+                        <option value="seasonal">Idény vagy szezonálismunka</option>
+                    </select>
+                </div>
+                <div>
                     <label class="pl-2" for="company_id">Cég</label><br>
                     <select name="company_id" id="company_id" class="pr-10 py-3 rounded-lg" disabled>
                         @php($comp_id = session('company_id'))
@@ -43,11 +50,11 @@
             </div>
             <div>
                 <x-primary-button class="mt-4 bg-mountain-light p-4 rounded-lg hover:bg-mountain-dark hover:text-white transition duration-300 ease-in-out">
-                    {{ __('Save') }}
+                    {{ __('Mentés') }}
                 </x-primary-button>
                 <x-secondary-button class="mt-4 bg-white p-4 rounded-lg hover:bg-mountain-light hover:text-white transition duration-300 ease-in-out"
                                     onClick="window.location='{{ URL::route('employees.index') }}'">
-                    {{ __('Back') }}
+                    {{ __('Vissza') }}
                 </x-secondary-button>
             </div>
         </form>

@@ -28,7 +28,7 @@ Route::get('/', function () {
 
 Route::resource('employees', EmployeeController::class)
     ->only(['index', 'store', 'create', 'edit', 'destroy', 'update'])
-    ->middleware(['auth', 'verified', 'admin']);
+    ->middleware(['auth', 'admin']);
 
 Route::resource('companies', CompanyController::class)
     ->only(['index', 'store', 'create', 'edit', 'update', 'destroy'])

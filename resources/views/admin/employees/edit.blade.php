@@ -34,6 +34,18 @@
                     <input class="rounded-lg" type="date" name="born_date" value="{{ date('Y-m-d',strtotime($employee[0]->born_date)) }}">
                 </div>
                 <div>
+                    <label class="pl-2" for="type">Foglalkoztatás típusa:</label><br>
+                    <select name="type" id="type" class="pr-10 py-3 rounded-lg">
+                        @if($employee[0]->type == "seasonal")
+                            <option value="casual">Alkalmi munka</option>
+                            <option value="seasonal" selected>Idény vagy szezonálismunka</option>
+                        @else
+                            <option value="casual" selected>Alkalmi munka</option>
+                            <option value="seasonal">Idény vagy szezonálismunka</option>
+                        @endif
+                    </select>
+                </div>
+                <div>
                     <label class="pl-2" for="company_id">Cég</label><br>
                     <select name="company_id" id="company_id" class="pr-10 py-3 rounded-lg">
                         @foreach($companies as $data)

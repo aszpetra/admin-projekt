@@ -90,12 +90,20 @@ class ShiftEmployeeController extends Controller
             $shift_employee->save();
 
             $employee = DB::table('employees')
+                ->select('*')
                 ->where('user_id', '=', $employees[$i])
                 ->first();
 
-            DB::table('employees')
-                ->where('user_id', '=', $employees[$i])
-                ->update(['days' => $employee->days + 1]);
+            if($employee->type == "seasonal"){
+                DB::table('employees')
+                    ->where('user_id', '=', $employees[$i])
+                    ->update(['seasonal_days' => $employee->seasonal_days + 1]);
+            }else {
+                DB::table('employees')
+                    ->where('user_id', '=', $employees[$i])
+                    ->update(['casual_days' => $employee->casual_days + 1]);
+            }
+
         }
 
         return redirect(route('shift_employee.index'))->with('success', 'Sikeresen létrehozva!');
@@ -167,7 +175,6 @@ class ShiftEmployeeController extends Controller
             ->select('users.id', 'name')
             ->where('is_admin', "=", false)
             ->where('employees.company_id', '=', $company_id)
-            ->orderBy('days', 'ASC')
             ->get();
 
         foreach ($users as $user) {
@@ -208,16 +215,50 @@ class ShiftEmployeeController extends Controller
                         $subtract_prev = $last_end->diffInHours($this_start);
 
                         if($subtract_prev > 8 ){
-                            if ($employee->days < 15){
-                                if(!empty($next_shift->first())){
-                                    $this_end =  Carbon::create($shift_log->end);
-                                    $next_start = Carbon::create($next_shift[0]->start);
-                                    $subtract_next = $next_start->diffInHours($this_end);
-                                    if($subtract_next > 8){
+                            if($employee->type == "seasonal"){
+                                if ($employee->seasonal_days <= 120){
+                                    if(!empty($next_shift->first())){
+                                        $this_end =  Carbon::create($shift_log->end);
+                                        $next_start = Carbon::create($next_shift[0]->start);
+                                        $subtract_next = $next_start->diffInHours($this_end);
+                                        if($subtract_next > 8){
+                                            array_push($available_emp, $user);
+                                        }
+                                    }else {
                                         array_push($available_emp, $user);
                                     }
-                                }else {
-                                    array_push($available_emp, $user);
+                                }
+                            }else {
+                                if($employee->casual_days <= 90) {
+                                    if (!empty($next_shift->first())) {
+                                        $this_end = Carbon::create($shift_log->end);
+                                        $next_start = Carbon::create($next_shift[0]->start);
+                                        $subtract_next = $next_start->diffInHours($this_end);
+                                    }
+                                    if (empty($next_shift->first()) || $subtract_next > 8) {
+                                        $now = Carbon::today();
+                                        $month_start = $now->startOfMonth();
+                                        $month_end = $now->endOfMonth();
+
+                                        $days_worked = DB::table('shift_logs')
+                                            ->leftJoin('shift_employees', 'shift_employees.shift_id', '=', 'shift_logs.id')
+                                            ->where('shift_employees.employee_id', '=', $employee->user_id)
+                                            ->whereBetween('start', [$month_start, $month_end])
+                                            ->count();
+                                        $today = Carbon::today();
+                                        $five_days_ago = $today->subDays(5);
+                                        $days_in_row = DB::table('shift_logs')
+                                            ->leftJoin('shift_employees', 'shift_employees.shift_id', '=', 'shift_logs.id')
+                                            ->where('shift_employees.employee_id', '=', $employee->user_id)
+                                            ->whereBetween('start', [$five_days_ago, $today])
+                                            ->count();
+
+                                        if ($days_worked < 15) {
+                                            if ($days_in_row < 5) {
+                                                array_push($available_emp, $user);
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -289,13 +330,20 @@ class ShiftEmployeeController extends Controller
                 $shift_emp->save();
 
                 $employee = DB::table('employees')
-                    ->select('days')
+                    ->select('*')
                     ->where('user_id', '=', $shift_emp->employee_id)
                     ->first();
 
-                $attr = [
-                    'days' => $employee->days + 1,
-                ];
+                if($employee->type == "seasonal"){
+                    $attr = [
+                        'seasonal_days' => $employee->seasonal_days + 1,
+                    ];
+                }else {
+                    $attr = [
+                        'casual_days' => $employee->casual_days + 1,
+                    ];
+                }
+
 
                 DB::table('employees')
                     ->where('user_id', '=', $shift_emp->employee_id)
@@ -326,9 +374,16 @@ class ShiftEmployeeController extends Controller
             ->where('user_id', '=', $shift_employee->employee_id)
             ->first();
 
-        $attributes = [
-            'days' => $employee->days - 1,
-        ];
+        if($employee->type == "seasonal"){
+            $attributes = [
+                'seasonal_days' => $employee->seasonal_days - 1,
+            ];
+        }else {
+            $attributes = [
+                'casual_days' => $employee->casual_days - 1,
+            ];
+        }
+
 
         DB::table('employees')
             ->where('user_id', '=', $employee->user_id)
