@@ -16,7 +16,7 @@
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100">
-            @if(Route::is('home'))
+            @if(Route::is('home') || Route::is('holiday_list') || Route::is('holiday_create'))
                 @include('layouts.employee_nav')
             @else
                 @include('layouts.navigation')
